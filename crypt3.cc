@@ -7,7 +7,7 @@
 
 using namespace v8;
 
-NAN_METHOD(Method) {
+NAN_METHOD(crypt_fn) {
 	Nan::HandleScope scope;
 
 	if (info.Length() < 2) {
@@ -18,8 +18,8 @@ NAN_METHOD(Method) {
 		return Nan::ThrowTypeError("Wrong arguments");
 	}
 
-	v8::String::Utf8Value key(info[0]->ToString());
-	v8::String::Utf8Value salt(info[1]->ToString());
+        Nan::Utf8String key(info[0]);
+        Nan::Utf8String salt(info[1]);
 
 	char* res = crypt(*key, *salt);
 	if (res != NULL) {
@@ -29,9 +29,8 @@ NAN_METHOD(Method) {
 	}
 }
 
-void init(Handle<Object> exports) {
-	exports->Set(Nan::New<String>("crypt").ToLocalChecked(),
-		Nan::New<FunctionTemplate>(Method)->GetFunction());
+NAN_MODULE_INIT(init) {
+    Nan::Export(target, "crypt", crypt_fn);
 }
 
 NODE_MODULE(crypt3, init)
